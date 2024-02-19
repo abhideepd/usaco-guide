@@ -566,85 +566,68 @@ int main() {
 <JavaSection>
 
 ```java
-import java.io.*;
-import java.util.*;
+import java.io.BufferedReader;
+import java.io.IOException;
+import java.io.InputStreamReader;
+import java.util.Arrays;
+import java.util.HashSet;
+import java.util.StringTokenizer;
 
-public class Badge {
-	static int[] adj;
-	static int[] ans;
-	/*
-	 * For each node, we need a list to store its children; at nodes
-	 * combining the cycle with other part of the connected component, there
-	 * would be more than one outgoing arrow in the reversed adjacency list
-	 */
-	static List<List<Integer>> radj;
-
-	public static void main(String[] args) throws IOException {
-		BufferedReader in =
-		    new BufferedReader(new InputStreamReader(System.in));
-
-		int n = Integer.parseInt(in.readLine());
-		adj = new int[n];
-		ans = new int[n];
-		radj = new ArrayList<>();
-
-		StringTokenizer st = new StringTokenizer(in.readLine());
-		for (int i = 0; i < n; i++) {
-			adj[i] = Integer.parseInt(st.nextToken()) - 1;
-			ans[i] = -1;
-			radj.add(new ArrayList<>());
-		}
-
-		for (int i = 0; i < n; i++) { radj.get(adj[i]).add(i); }
-
-		for (int i = 0; i < n; i++) {
-			// run Floyd's algorithm on every connected component
-			if (ans[i] == -1) { floyd(i); }
-		}
-
-		for (int i = 0; i < n; i++) { System.out.print(ans[i] + 1 + " "); }
-	}
-
-	private static void floyd(int x) {
-		int a = adj[x];
-		int b = adj[adj[x]];
-
-		// find a cycle using Floyd's algorithm
-		while (a != b) {
-			a = adj[a];
-			b = adj[adj[b]];
-		}
-
-		// for each node a in the cycle, the answer ans[a] will be a as well
-		do {
-			ans[a] = a;
-			a = adj[a];
-		} while (a != b);
-
-		// for each node a that has outgoing arrow(s) pointing to the acyclic
-		// part we set their answers with fillRadj
-		do {
-			fillRadj(a);
-			a = adj[a];
-		} while (a != b);
-	}
-
-	private static void fillRadj(int x) {
-		for (int child : radj.get(x)) {
-			/*
-			 * As all nodes in the cycle are processed in method floyd, the
-			 * recursive call will only start at the nodes which combine the
-			 * cycle with the acyclic part of the connected component, where one
-			 * of its outgoing arrows points to the node that is not processed
-			 * yet
-			 */
-			if (ans[child] == -1) {
-				ans[child] = ans[x];
-				fillRadj(child);
-			}
-		}
-	}
+public class Codeforces_Badge {
+    static BufferedReader x=new BufferedReader(new InputStreamReader(System.in));
+    public static void main(String[] args)throws IOException {
+        StringTokenizer st=new StringTokenizer(x.readLine());
+        int n=Integer.parseInt(st.nextToken());
+        int arr[]=new int[n+1];
+        st=new StringTokenizer(x.readLine());
+        for(int i=1;i<=n;i++){
+            arr[i]=Integer.parseInt(st.nextToken());
+        }
+//        getAnswer1(arr, n);
+//        getAnswer2(arr, n);
+        getAnswer3(arr, n);
+    }
+    static void getAnswer3(int arr[], int n){
+        int ans[]=new int[n+1];
+        class method{
+            void floyd(int curr){
+                int a=arr[curr];
+                int b=arr[arr[curr]];
+                while(a!=b){
+                    a=arr[a];
+                    b=arr[arr[b]];
+                }
+                a=curr;
+                // finds the entry cycle node, as well as, fills in the ans array of nodes in the cycle
+                while(a!=b) {
+                    ans[b]=b;
+                    a=arr[a];
+                    b=arr[b];
+                }
+                int cycleFirst=a;
+                ans[cycleFirst]=cycleFirst;
+                a=curr;
+                // fills the ans array of nodes, outside the cycle
+                while(a!=cycleFirst){
+                    ans[a]=cycleFirst;
+                    a=arr[a];
+                }
+            }
+        }
+        Arrays.fill(ans, -1);
+        for(int i=1;i<=n;i++){
+            if(ans[i]==-1){
+                new method().floyd(i);
+            }
+        }
+        StringBuilder output=new StringBuilder();
+        for(int i=1;i<=n;i++){
+            output.append(ans[i]).append(" ");
+        }
+        System.out.println(output);
+    }
 }
+
 ```
 
 </JavaSection>
